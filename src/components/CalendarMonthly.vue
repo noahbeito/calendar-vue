@@ -8,7 +8,6 @@
         <button @click="handleToday" class="today-button">Today</button>
       </div>
     </div>
-    <div class="calendar-grid-container">
       <table>
         <thead>
           <tr>
@@ -23,8 +22,7 @@
           </tr>
         </tbody>
       </table>
-    </div>
-  </div>
+   </div>
 </template>
 
 <script>

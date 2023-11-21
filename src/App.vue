@@ -6,7 +6,9 @@ import CalendarMonthly from './components/CalendarMonthly.vue'
   <header></header>
 
   <main>
-    <CalendarMonthly />
+    <div class="calendar-container">
+      <CalendarMonthly />
+    </div>
   </main>
 </template>
 

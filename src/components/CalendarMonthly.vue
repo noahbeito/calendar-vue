@@ -219,7 +219,7 @@
     text-align: center;
     width: calc(100% / 7);
     height: 60px;
-    cursor: default;
+    cursor: pointer;
   }
 
   .current-month:hover, .other-month:hover {
@@ -268,6 +268,7 @@
     border-radius: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
     transition: all 0.3s ease;
+    color: black;
   }
 
   .modal-header h3 {

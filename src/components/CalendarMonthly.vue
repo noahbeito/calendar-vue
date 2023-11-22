@@ -16,13 +16,42 @@
         </thead>
         <tbody>
           <tr v-for="(week, index) in renderDays()" :key="index">
-            <td v-for="dayInfo in week" :key="dayInfo.dayNum + dayInfo.class" :class="dayInfo.class">
+            <td v-for="dayInfo in week" @click="showModal = true" :key="dayInfo.dayNum + dayInfo.class" :class="dayInfo.class">
               {{ dayInfo.dayNum }}
             </td>
           </tr>
         </tbody>
       </table>
    </div>
+   <transition name="modal">
+        <div v-if="showModal" class="modal-mask">
+          <div class="modal-wrapper">
+            <div class="modal-container">
+
+              <div class="modal-header">
+                <slot name="header">
+                  default header
+                </slot>
+              </div>
+
+              <div class="modal-body">
+                <slot name="body">
+                  default body
+                </slot>
+              </div>
+
+              <div class="modal-footer">
+                <slot name="footer">
+                  default footer
+                  <button class="modal-default-button" @click="showModal = false">
+                    OK
+                  </button>
+                </slot>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
 </template>
 
 <script>
@@ -31,6 +60,7 @@
       daysOfWeek: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
+      showModal: true,
     }),
     methods: {
       getMonth() {
@@ -64,6 +94,7 @@
         let prevMonthOverflowCount = firstDayOfMonthIndex;
         let day = 1;
 
+        // Add the days from the previous month to the total list of days to be displayed
         while (prevMonthOverflowCount > 0) {
           const prevMonthDayInfo = {
             dayNum: daysInPrevMonth,
@@ -78,6 +109,7 @@
 
         totalListOfDays.push(...prevMonthDays);
 
+        // Add the days from the current month to total list of days to be displayed
         while (day <= daysInMonth) {
           const date = new Date(this.currentYear, this.currentMonth, day);
           const isCurrentMonth = day <= daysInMonth;
@@ -94,6 +126,7 @@
         let nextMonthOverflow = (weeksInMonth * 7) - totalListOfDays.length;
         let nextMonthDay = 1;
 
+        // Add the days from next month to total list of days to be displayed
         while (nextMonthOverflow > 0) {
           const nextMonthDayInfo = {
             dayNum: nextMonthDay,
@@ -104,6 +137,7 @@
           nextMonthOverflow--;
         }
 
+        // Build the 2d array of days for the current month
         const calendarGrid = [];
         let count = 0;
 
@@ -128,11 +162,14 @@
   }
 
   .calendar-wrapper {
-    width: 400px;
+    width: 420px;
+    background-color: white;
+    padding: 10px;
   }
 
   .header-container {
     display: flex;
+    color: black;
     justify-content: space-between;
     align-items: center;
     padding: 0 15px;
@@ -141,6 +178,7 @@
   .header-month-year {
     font-size: 1.4em;
     padding: 1px 6px;
+    cursor: default;
   }
 
   .header-buttons {
@@ -172,11 +210,16 @@
     border-collapse: collapse;
   }
 
+  th {
+    color: black;
+  }
+
   th, td {
     box-sizing: border-box;
     text-align: center;
     width: calc(100% / 7);
     height: 60px;
+    cursor: default;
   }
 
   .current-month:hover, .other-month:hover {
@@ -197,15 +240,62 @@
     color: white;
     border-radius: 50%;
   }
-  .event-dot {
-    display: block;
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    left: 50%;
-    transform: translate(-50%);
-    background-color: #4285f4;
-    border-radius: 50%;
+
+  /* Modal Styling */
+
+  .modal-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: table;
+  transition: opacity 0.3s ease;
+}
+
+  .modal-wrapper {
+    display: table-cell;
+    vertical-align: middle;
   }
 
+  .modal-container {
+    width: 300px;
+    margin: 0px auto;
+    padding: 20px 30px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+    transition: all 0.3s ease;
+  }
+
+  .modal-header h3 {
+    margin-top: 0;
+    color: #42b983;
+  }
+
+  .modal-body {
+    margin: 20px 0;
+  }
+
+  .modal-default-button {
+    float: right;
+  }
+
+  /* Modal Transitions */
+
+  .modal-enter {
+    opacity: 0;
+  }
+
+  .modal-leave-active {
+    opacity: 0;
+  }
+
+  .modal-enter .modal-container,
+  .modal-leave-active .modal-container {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
 </style>

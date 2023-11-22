@@ -1,14 +1,21 @@
 # calendarVue
 
-This template should help get you started developing with Vue 3 in Vite.
+## Notes
+- I decided to keep everything in a single file component to keep the calendar and its functionaty as modular as possible. It might make sense in the scope of a larger project to make the modal its own reusable component, especially if there were other locations where a modal would be needed.
 
-## Recommended IDE Setup
+- Additional add ons:
+    - Today button: this returns the calendar to the current month of today's date
+    - Add and view events: this allows the user to click on a day and a modal will pop up. The modal will show any existing events scheduled for that day and allow the user to add new events. Events will be displayed in chronological order. When the modal is closed, days that have events scheduled will show a small blue dot under the day number.
+    - Events do not persist if you reload the page as I didn't setup any methods of data persistence for the scope of this project.
+- Potential Improvements:
+    - There are a couple console errors that I did not yet address. This is something I would ideally like to correct.
+    - Event editing and deletion
+    - make more modular by being able to pass props that can customize the size and alignment of the calendar. This would likely make it easier to add into an existing application.
+    - Add data persistence via a database or local storage.
+    - Add accessibility i.e. ARIA labels for screen readers.
+    - add testing, unit and end-to-end tests
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Project Setup
 
@@ -26,10 +33,4 @@ npm run dev
 
 ```sh
 npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
 ```

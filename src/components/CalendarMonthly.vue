@@ -1,4 +1,5 @@
 <template>
+  <!-- *************** Calendar *************** -->
   <div class="calendar-wrapper">
     <div class="header-container">
       <div class="header-month-year">{{ getMonth() }} {{ currentYear }}</div>
@@ -24,11 +25,11 @@
         </tbody>
       </table>
    </div>
+   <!-- *************** Modal *************** -->
    <transition name="modal">
         <div v-if="showModal" class="modal-mask">
           <div class="modal-wrapper">
             <div class="modal-container">
-<!--  ------- Look into if we want to use slots in this modal or not  --------------- -->
               <div class="modal-header">
                 <slot name="header">
                   <h2>{{ selectedDate.toDateString() }}</h2>
@@ -42,7 +43,7 @@
                 <slot name="body">
                   <ul v-if="eventsForSelectedDate.length">
                     <li v-for="(event, index) in eventsForSelectedDate" :key="index">
-                      {{ event.time }}: {{ event.description }}
+                      {{ event.time }} - {{ event.description }}
                     </li>
                   </ul>
                 </slot>
@@ -52,8 +53,7 @@
                 <slot name="footer">
                   <input type="time" v-model="newEventTime"/>
                   <textarea v-model="newEventDescription"></textarea>
-                  <button @click="addEvent">Add</button>
-
+                  <button @click="addEvent" class="add-event-button">Add Event</button>
                 </slot>
               </div>
             </div>
@@ -78,16 +78,27 @@
       eventsForSelectedDate() {
         if (this.selectedDate) {
           const dateString = this.selectedDate.toISOString().split('T')[0];
-          return this.events[dateString] || [];
+          const events = this.events[dateString] || [];
+
+          const sortedEvents = events.sort((a, b) => {
+            const timeA = a.time.toLowerCase();
+            const timeB = b.time.toLowerCase();
+            return timeA.localeCompare(timeB);
+          });
+
+          const formattedTimeEvents = sortedEvents.map((item) => {
+            return {
+              ...item,
+              // using dummy date of 2000-01-01, only need to format the time
+              time: new Date(`2000-01-01T${item.time}`).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+              }),
+            };
+          });
+          return formattedTimeEvents;
         }
         return [];
-      },
-      hasEvents() {
-        return (dayInfo) => {
-          console.log('hasEvents dayINfo: ', dayInfo);
-          const dateString = new Date(this.currentYear, this.currentMonth, dayInfo.dayNum).toDateString();
-          return this.events[dateString] && this.events[dateString].length > 0;
-        }
       }
     },
     methods: {
@@ -185,7 +196,6 @@
       },
       addEvent() {
         if (this.selectedDate && this.newEventTime && this.newEventDescription) {
-          console.log(this.selectedDate);
           const dateString = this.selectedDate.toISOString().split('T')[0];
 
           const newEvent = {
@@ -203,6 +213,13 @@
         this.newEventTime = '';
         this.newEventDescription = '';
         this.closeModal();
+      },
+      hasEvents(dayInfo) {
+        if (dayInfo.class.includes('current-month')) {
+          const dateString = new Date(this.currentYear, this.currentMonth, dayInfo.dayNum).toISOString().split('T')[0];
+          return !!(this.events[dateString] && this.events[dateString].length > 0);
+        }
+        return false;
       },
       closeModal() {
         this.showModal = false;
@@ -279,6 +296,10 @@
     cursor: pointer;
   }
 
+  td {
+    position: relative;
+  }
+
   .current-month:hover, .other-month:hover {
     background-color: lightblue;
     border-radius: 50%;
@@ -300,15 +321,17 @@
   .event-dot {
     display: block;
     position: absolute;
-    width: 6px;
-    height: 6px;
+    top: 70%;
     left: 50%;
-    transform: translate(-50%);
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
     background-color: #4285f4;
+    border: 1px solid white;
     border-radius: 50%;
   }
 
-  /* Modal Styling */
+  /* --------------- Modal Styling --------------- */
 
   .modal-mask {
   position: fixed;
@@ -328,9 +351,10 @@
   }
 
   .modal-container {
+    position: relative;
     width: 300px;
     margin: 0px auto;
-    padding: 20px 30px;
+    padding: 10px 20px;
     background-color: #fff;
     border-radius: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
@@ -338,20 +362,79 @@
     color: black;
   }
 
-  .modal-header h3 {
+  .modal-header {
     margin-top: 0;
-    color: #42b983;
   }
 
   .modal-body {
     margin: 20px 0;
   }
 
-  .modal-default-button {
-    float: right;
+  ul {
+    list-style-type: none;
+    padding: 0;
   }
 
-  /* Modal Transitions */
+  .modal-default-button, .add-event-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .modal-default-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.4em;
+  }
+  button.add-event-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #1b72e8;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button.add-event-button:hover {
+    background-color: #1558c7;
+  }
+
+/* Time Selector */
+input[type="time"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1em;
+  margin-bottom: 10px;
+}
+
+/* Text Input */
+textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1em;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+input[type="time"]:focus,
+textarea:focus {
+  border-color: #1b72e8;
+  box-shadow: 0 0 8px rgba(27, 114, 232, 0.5);
+  outline: none;
+}
+
+
+  /* --------------- Modal Transitions ---------------*/
 
   .modal-enter {
     opacity: 0;

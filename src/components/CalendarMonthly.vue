@@ -16,8 +16,9 @@
         </thead>
         <tbody>
           <tr v-for="(week, index) in renderDays()" :key="index">
-            <td v-for="dayInfo in week" @click="showModal = true" :key="dayInfo.dayNum + dayInfo.class" :class="dayInfo.class">
+            <td v-for="dayInfo in week" @click="handleDayClick(dayInfo)" :key="dayInfo.dayNum + dayInfo.class" :class="dayInfo.class">
               {{ dayInfo.dayNum }}
+              <span v-if="hasEvents(dayInfo)" class="event-dot"></span>
             </td>
           </tr>
         </tbody>
@@ -27,25 +28,32 @@
         <div v-if="showModal" class="modal-mask">
           <div class="modal-wrapper">
             <div class="modal-container">
-
+<!--  ------- Look into if we want to use slots in this modal or not  --------------- -->
               <div class="modal-header">
                 <slot name="header">
-                  default header
+                  <h2>{{ selectedDate.toDateString() }}</h2>
+                  <button class="modal-default-button" @click="closeModal">
+                    &times;
+                  </button>
                 </slot>
               </div>
 
               <div class="modal-body">
                 <slot name="body">
-                  default body
+                  <ul v-if="eventsForSelectedDate.length">
+                    <li v-for="(event, index) in eventsForSelectedDate" :key="index">
+                      {{ event.time }}: {{ event.description }}
+                    </li>
+                  </ul>
                 </slot>
               </div>
 
               <div class="modal-footer">
                 <slot name="footer">
-                  default footer
-                  <button class="modal-default-button" @click="showModal = false">
-                    OK
-                  </button>
+                  <input type="time" v-model="newEventTime"/>
+                  <textarea v-model="newEventDescription"></textarea>
+                  <button @click="addEvent">Add</button>
+
                 </slot>
               </div>
             </div>
@@ -60,8 +68,28 @@
       daysOfWeek: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
-      showModal: true,
+      selectedDate: null,
+      showModal: false,
+      events: {},
+      newEventTime: '',
+      newEventDescription: '',
     }),
+    computed: {
+      eventsForSelectedDate() {
+        if (this.selectedDate) {
+          const dateString = this.selectedDate.toISOString().split('T')[0];
+          return this.events[dateString] || [];
+        }
+        return [];
+      },
+      hasEvents() {
+        return (dayInfo) => {
+          console.log('hasEvents dayINfo: ', dayInfo);
+          const dateString = new Date(this.currentYear, this.currentMonth, dayInfo.dayNum).toDateString();
+          return this.events[dateString] && this.events[dateString].length > 0;
+        }
+      }
+    },
     methods: {
       getMonth() {
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -151,6 +179,35 @@
         }
         return calendarGrid;
       },
+      handleDayClick(dayInfo) {
+        this.selectedDate = new Date(this.currentYear, this.currentMonth, dayInfo.dayNum);
+        this.showModal = true;
+      },
+      addEvent() {
+        if (this.selectedDate && this.newEventTime && this.newEventDescription) {
+          console.log(this.selectedDate);
+          const dateString = this.selectedDate.toISOString().split('T')[0];
+
+          const newEvent = {
+            time: this.newEventTime,
+            description: this.newEventDescription,
+          };
+
+          if (!this.events[dateString]) {
+            this.events[dateString] = [newEvent];
+          } else {
+            this.events[dateString].push(newEvent);
+          }
+        }
+
+        this.newEventTime = '';
+        this.newEventDescription = '';
+        this.closeModal();
+      },
+      closeModal() {
+        this.showModal = false;
+        this.selectedDate = null;
+      }
     }
   }
 </script>
@@ -238,6 +295,16 @@
   .current-day {
     background-color: #1b72e8;
     color: white;
+    border-radius: 50%;
+  }
+  .event-dot {
+    display: block;
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    left: 50%;
+    transform: translate(-50%);
+    background-color: #4285f4;
     border-radius: 50%;
   }
 

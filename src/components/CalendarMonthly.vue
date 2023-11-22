@@ -331,8 +331,7 @@
     border-radius: 50%;
   }
 
-  /* --------------- Modal Styling --------------- */
-
+  /* Modal Styling */
   .modal-mask {
   position: fixed;
   z-index: 9998;
@@ -433,8 +432,7 @@ textarea:focus {
   outline: none;
 }
 
-
-  /* --------------- Modal Transitions ---------------*/
+  /* Modal Transitions */
 
   .modal-enter {
     opacity: 0;

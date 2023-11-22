@@ -1,9 +1,8 @@
 # calendarVue
 
-![image](https://github.com/noahbeito/calendar-vue/assets/90667844/779ea728-ea1f-4893-a8fa-f7396391dd17)
-
-![image](https://github.com/noahbeito/calendar-vue/assets/90667844/e2459aae-5ced-4107-8d02-dffe24342d2f)
-
+Calendar            |  Event Modal
+:-------------------------:|:-------------------------:
+![image](https://github.com/noahbeito/calendar-vue/assets/90667844/779ea728-ea1f-4893-a8fa-f7396391dd17)  |  ![image](https://github.com/noahbeito/calendar-vue/assets/90667844/e2459aae-5ced-4107-8d02-dffe24342d2f)
 
 ## Notes
 - I decided to keep everything in a single file component to keep the calendar and its functionaty as modular as possible. It might make sense in the scope of a larger project to make the modal its own reusable component, especially if there were other locations where a modal would be needed.
